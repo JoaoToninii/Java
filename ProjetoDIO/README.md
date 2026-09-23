@@ -43,7 +43,7 @@ A aplicação implementa um fluxo completo de processamento de comandos financei
 Abra o terminal e navegue até a pasta do projeto:
 
 ```powershell
-cd C:\Users\jgton\.gemini\antigravity-ide\scratch\voice-budget-api
+cd ProjetoDIO
 ```
 
 *(Opcional)* Se você tiver uma chave da OpenAI, configure-a no terminal:

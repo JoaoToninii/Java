@@ -1,0 +1,66 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: voice-budget-api
+
+  # Banco de Dados H2
+  datasource:
+    url: jdbc:h2:mem:budgetdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  # JPA & Hibernate
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Configurações de Upload de Áudio
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+
+  # Spring AI OpenAI
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:mock-key}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.1
+      audio:
+        transcription:
+          options:
+            model: whisper-1
+            response-format: json
+        speech:
+          options:
+            model: tts-1
+            voice: alloy
+            response-format: mp3
+
+# Configurações Customizadas da Aplicação
+app:
+  ai:
+    # Se true ou se OPENAI_API_KEY for mock-key/vazia, ativa o modo simulador inteligente
+    mock-fallback-enabled: true

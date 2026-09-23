@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Budget AI - Assistente de Orçamento por Voz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="logo-icon">🎙️</div>
+                <div>
+                    <h1>Voice Budget AI</h1>
+                    <p class="subtitle">Assistente Financeiro Inteligente com Spring Boot & Spring AI</p>
+                </div>
+            </div>
+            <div class="badges">
+                <span class="badge badge-spring">Spring AI 1.0.0</span>
+                <span class="badge badge-whisper">Whisper STT</span>
+                <span class="badge badge-tools">Tool Calling</span>
+            </div>
+        </header>
+
+        <!-- KPI Balance Cards -->
+        <section class="kpi-grid">
+            <div class="card kpi-card saldo-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Saldo Consolidado</span>
+                    <span class="kpi-icon">💰</span>
+                </div>
+                <div class="kpi-value" id="kpi-saldo">R$ 0,00</div>
+                <div class="kpi-status" id="kpi-status">Status: Normal</div>
+            </div>
+
+            <div class="card kpi-card receita-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total de Receitas</span>
+                    <span class="kpi-icon">📈</span>
+                </div>
+                <div class="kpi-value text-success" id="kpi-receitas">R$ 0,00</div>
+                <div class="kpi-sub">Entradas acumuladas</div>
+            </div>
+
+            <div class="card kpi-card despesa-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total de Despesas</span>
+                    <span class="kpi-icon">📉</span>
+                </div>
+                <div class="kpi-value text-danger" id="kpi-despesas">R$ 0,00</div>
+                <div class="kpi-sub">Saídas e gastos</div>
+            </div>
+        </section>
+
+        <!-- Main Content Area -->
+        <div class="main-layout">
+            <!-- Left Column: Voice & Chat Interface -->
+            <div class="left-col">
+                <!-- Voice Assistant Console -->
+                <div class="card assistant-card">
+                    <div class="card-header">
+                        <h2>Comando por Voz & IA</h2>
+                        <span class="indicator-pulse" id="mic-indicator"></span>
+                    </div>
+
+                    <!-- Voice Recorder Central Button -->
+                    <div class="recorder-section">
+                        <button id="btn-record" class="record-btn" title="Clique para gravar ou parar">
+                            <span class="mic-icon">🎙️</span>
+                            <span class="btn-text" id="record-btn-text">Gravar Comando de Voz</span>
+                        </button>
+                        <p class="record-hint" id="record-status-hint">Clique para iniciar a gravação pelo microfone</p>
+                        <div class="audio-timer" id="record-timer" style="display: none;">00:00</div>
+                    </div>
+
+                    <!-- File Upload Alternative -->
+                    <div class="file-upload-box">
+                        <label for="audio-file-input" class="file-label">
+                            📁 Ou envie um arquivo de áudio (.wav, .mp3, .m4a):
+                        </label>
+                        <input type="file" id="audio-file-input" accept="audio/*">
+                    </div>
+
+                    <div class="divider"><span>OU DIGITE</span></div>
+
+                    <!-- Text Chat Form -->
+                    <form id="text-chat-form" class="chat-form">
+                        <div class="input-group">
+                            <input type="text" id="chat-input" placeholder="Ex: Gastei 85 reais no jantar com amigos..." autocomplete="off">
+                            <button type="submit" id="btn-send-text" class="btn-primary">Enviar</button>
+                        </div>
+                    </form>
+
+                    <!-- Quick Suggestions -->
+                    <div class="quick-prompts">
+                        <span class="quick-title">Sugestões rápidas:</span>
+                        <button class="chip" data-prompt="Qual é o meu saldo atual?">Qual meu saldo?</button>
+                        <button class="chip" data-prompt="Gastei 42 reais na padaria para o café">Gastei 42 no café</button>
+                        <button class="chip" data-prompt="Recebi um pix de 350 reais referente a freela">Recebi pix 350</button>
+                        <button class="chip" data-prompt="Mostre o meu extrato recente">Extrato recente</button>
+                        <button class="chip" data-prompt="Qual o resumo de gastos por categoria?">Resumo categorias</button>
+                    </div>
+
+                    <!-- AI Response Box -->
+                    <div class="response-container" id="response-box" style="display: none;">
+                        <div class="response-header">
+                            <span class="badge-role">🤖 Resposta do Assistente</span>
+                            <span class="response-time" id="response-time">0 ms</span>
+                        </div>
+                        
+                        <div class="transcript-box" id="transcript-display">
+                            <span class="label">Transcrição do Áudio:</span>
+                            <p id="transcript-text">-</p>
+                        </div>
+
+                        <div class="ai-speech-bubble" id="ai-answer-text">
+                            -
+                        </div>
+
+                        <!-- Audio Playback -->
+                        <div class="audio-player-wrapper" id="audio-player-wrapper" style="display: none;">
+                            <span class="audio-label">🔊 Ouvir resposta da IA:</span>
+                            <audio id="tts-audio-player" controls></audio>
+                        </div>
+
+                        <div class="actions-pill" id="actions-executed-wrapper">
+                            <span class="label">Ferramenta executada (Tool Calling):</span>
+                            <div class="pill-list" id="actions-pill-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log Section -->
+                <div class="card audit-card">
+                    <div class="card-header">
+                        <h3>Trilha de Auditoria Recente</h3>
+                        <button id="btn-refresh-audit" class="btn-link">Atualizar</button>
+                    </div>
+                    <div class="audit-list" id="audit-list">
+                        <div class="loading-state">Carregando histórico...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Transactions & Category Budgets -->
+            <div class="right-col">
+                <!-- Category Budget Limits -->
+                <div class="card categories-card">
+                    <div class="card-header">
+                        <h3>Limites de Orçamento por Categoria</h3>
+                        <span class="badge-info">Alerta a 80% e 100%</span>
+                    </div>
+                    <div class="category-bars" id="category-bars-list">
+                        <div class="loading-state">Calculando despesas por categoria...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Table -->
+                <div class="card transactions-card">
+                    <div class="card-header">
+                        <h3>Transações Recentes</h3>
+                        <button id="btn-refresh-transacoes" class="btn-link">Recarregar</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Categoria</th>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center">Carregando transações...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Voice Budget API &bull; Desenvolvido com <strong>Spring Boot 3</strong>, <strong>Spring AI</strong>, <strong>OpenAI Whisper & Tools</strong> e Banco <strong>H2</strong>.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
